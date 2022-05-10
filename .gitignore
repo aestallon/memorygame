@@ -1,0 +1,10 @@
+# Default ignored files by IntelliJ (its own gitignore is useless)
+.idea/shelf/
+.idea/workspace.xml
+.idea/.gitignore
+
+# Production files
+out/
+
+# Placeholder images
+resources/placeholder_images
