@@ -54,16 +54,72 @@ public class GamePanel extends JPanel {
         return new int[]{factor, cardCount / factor};
     }
 
+    // Inner class representing a card in the memory game.
+    private static class Card extends JButton {
 
-    public List<Card> getCards() {
-        return cards;
-    }
+        private static final Color DEFAULT_COLOR = Color.GRAY;
+        private static final int SIZE = 50;
+        private static int attemptCount = 0;
 
-    public Card getSelection() {
-        return selection;
-    }
+        private final Color secret;
 
-    public void setSelection(Card selection) {
-        this.selection = selection;
+        private boolean active = true;
+        private boolean timeout = false;
+
+        private Card(Color secret) {
+            // <------- Internal Data ------->
+            this.secret = secret;
+
+            // <-------- Appearance --------->
+            this.setBorder(null);
+            this.setBackground(DEFAULT_COLOR);
+            this.setFocusable(false);
+            this.setBorderPainted(false);
+            this.setFocusPainted(false);
+
+            // <--------- Behaviour --------->
+            this.addActionListener(e -> cardAction());
+
+        }
+
+        private void cardAction() {
+            if (!this.active || this.timeout) return;
+            if (!(this.getParent() instanceof GamePanel)) throw new AssertionError();
+
+            GamePanel gamePanel = (GamePanel) this.getParent();
+            Card previous = gamePanel.selection;
+            if (previous == null) {
+                this.setBackground(secret);
+                gamePanel.selection = this;
+                this.active = false;
+            } else {
+                attemptCount++;
+                if (previous != this) {
+                    this.setBackground(secret);
+                    if (this.secret.equals(previous.secret)) {
+                        this.active = false;            // ez a kártya is legyen passzív
+                        gamePanel.selection = null;   // ne legyen többé választott kártya.
+                    } else {
+                        // The colors don't match:
+                        gamePanel.cards.forEach(c -> c.timeout = true);
+                        Timer timer = new Timer(1_000, e -> {
+                            this.setBackground(DEFAULT_COLOR);
+                            previous.setBackground(DEFAULT_COLOR);
+
+                            this.active = true;
+                            previous.active = true;
+
+                            gamePanel.selection = null;
+                            gamePanel.cards.forEach(c -> c.timeout = false);
+                        });
+                        timer.setRepeats(false);
+                        timer.start();
+                    }
+                }
+            }
+            // Check if we won:
+            boolean victory = gamePanel.cards.stream().noneMatch(card -> card.active);
+            if (victory) gamePanel.doVictory();
+        }
     }
 }
