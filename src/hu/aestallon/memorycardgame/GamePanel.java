@@ -9,33 +9,33 @@ import java.util.Set;
 
 public class GamePanel extends JPanel {
 
-    private static final Set<Color> colours = Set.of(
-            Color.BLUE, Color.GREEN, Color.ORANGE, Color.PINK,
-            Color.RED, Color.YELLOW,
-            new Color(209, 78, 222),
-            new Color(37, 77, 10),
-            new Color(13, 29, 121),
-            new Color(34, 112, 77)
-    );
+    private static final ImageIcon DEFAULT_ICON = new ImageIcon("resources/default.png");
+    private static final int SIZE = 100;
 
     private final List<Card> cards;
     private Card selection = null;
 
-    public GamePanel() {
+    public GamePanel(Set<ImageIcon> imageSet) {
         // <------- Internal Data ------->
         cards = new ArrayList<>();
-        for (Color c : colours) {
-            cards.add(new Card(c));
-            cards.add(new Card(c));
+        for (ImageIcon icon : imageSet) {
+            cards.add(new Card(icon));
+            cards.add(new Card(icon));
         }
         Collections.shuffle(cards);
 
         // <-------- Appearance --------->
         int[] rowsAndCols = calculateRowsAndCols(cards.size());
-        this.setLayout(new GridLayout(rowsAndCols[0], rowsAndCols[1]));
+        GridLayout layout = new GridLayout(rowsAndCols[0], rowsAndCols[1], 5, 5);
+        this.setLayout(layout);
         for (Card card : cards) {
             this.add(card);
         }
+        // Resizing whole application:
+        int width = layout.getColumns() * SIZE;
+        int height = layout.getRows() *  SIZE;
+        this.setSize(new Dimension(width, height)); // Gamepanel mérete elvieg jó
+
         this.setBackground(new Color(87, 159, 170));
     }
 
@@ -56,23 +56,21 @@ public class GamePanel extends JPanel {
 
     // Inner class representing a card in the memory game.
     private static class Card extends JButton {
-
-        private static final Color DEFAULT_COLOR = Color.GRAY;
-        private static final int SIZE = 50;
         private static int attemptCount = 0;
 
-        private final Color secret;
+        private final ImageIcon secret;
 
         private boolean active = true;
         private boolean timeout = false;
 
-        private Card(Color secret) {
+        private Card(ImageIcon secret) {
             // <------- Internal Data ------->
             this.secret = secret;
 
             // <-------- Appearance --------->
             this.setBorder(null);
-            this.setBackground(DEFAULT_COLOR);
+            this.setIcon(DEFAULT_ICON);
+            this.setPreferredSize(new Dimension(100, 100));
             this.setFocusable(false);
             this.setBorderPainted(false);
             this.setFocusPainted(false);
@@ -89,13 +87,13 @@ public class GamePanel extends JPanel {
             GamePanel gamePanel = (GamePanel) this.getParent();
             Card previous = gamePanel.selection;
             if (previous == null) {
-                this.setBackground(secret);
+                this.setIcon(secret);
                 gamePanel.selection = this;
                 this.active = false;
             } else {
                 attemptCount++;
                 if (previous != this) {
-                    this.setBackground(secret);
+                    this.setIcon(secret);
                     if (this.secret.equals(previous.secret)) {
                         this.active = false;            // ez a kártya is legyen passzív
                         gamePanel.selection = null;   // ne legyen többé választott kártya.
@@ -103,8 +101,8 @@ public class GamePanel extends JPanel {
                         // The colors don't match:
                         gamePanel.cards.forEach(c -> c.timeout = true);
                         Timer timer = new Timer(1_000, e -> {
-                            this.setBackground(DEFAULT_COLOR);
-                            previous.setBackground(DEFAULT_COLOR);
+                            this.setIcon(DEFAULT_ICON);
+                            previous.setIcon(DEFAULT_ICON);
 
                             this.active = true;
                             previous.active = true;
