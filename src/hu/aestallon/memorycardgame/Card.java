@@ -69,9 +69,4 @@ public class Card extends JButton {
         boolean victory = gamePanel.getCards().stream().noneMatch(card -> card.active);
         if (victory) gamePanel.doVictory();
     }
-
-    @Override
-    public String toString() {
-        return secret.toString();
-    }
 }

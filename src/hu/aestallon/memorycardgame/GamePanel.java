@@ -11,11 +11,11 @@ public class GamePanel extends JPanel {
 
     private static final Set<Color> colours = Set.of(
             Color.BLUE, Color.GREEN, Color.ORANGE, Color.PINK,
-            Color.RED, Color.YELLOW/*,*/
-//            new Color(209, 78, 222),
-//            new Color(37, 77, 10),
-//            new Color(13, 29, 121),
-//            new Color(34, 112, 77)
+            Color.RED, Color.YELLOW,
+            new Color(209, 78, 222),
+            new Color(37, 77, 10),
+            new Color(13, 29, 121),
+            new Color(34, 112, 77)
     );
 
     private final List<Card> cards;
