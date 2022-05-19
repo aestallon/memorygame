@@ -20,7 +20,7 @@ public class AppFrame extends JFrame {
         JButton startButton = new JButton("New Game");
         startButton.setSize(100, 40);
         startButton.setLocation(0, 0);
-        startButton.addActionListener(e -> createNewGame(Main.KRESZ_IMAGES));
+        startButton.addActionListener(e -> createNewGame(Main.FISH));
         this.add(startButton);
 
         // <------------ MISC ------------>

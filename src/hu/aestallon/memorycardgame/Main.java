@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 public class Main {
     public static final Set<ImageIcon> KRESZ_IMAGES = loadImages("resources/kresz");
     public static final Set<ImageIcon> COL_IMAGES = loadImages("resources/placeholder_images");
+    public static final Set<ImageIcon> FISH = loadImages("resources/fish");
 
     private Main() {}
 

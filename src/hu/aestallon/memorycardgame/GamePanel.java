@@ -10,7 +10,7 @@ import java.util.Set;
 public class GamePanel extends JPanel {
 
     private static final ImageIcon DEFAULT_ICON = new ImageIcon("resources/default.png");
-    private static final int SIZE = 100;
+    private static final int SIZE = 70;
 
     private final List<Card> cards;
     private Card selection = null;
@@ -26,14 +26,12 @@ public class GamePanel extends JPanel {
 
         // <-------- Appearance --------->
         int[] rowsAndCols = calculateRowsAndCols(cards.size());
-        GridLayout layout = new GridLayout(rowsAndCols[0], rowsAndCols[1], 5, 5);
+        GridLayout layout = new GridLayout(rowsAndCols[0], rowsAndCols[1]);
         this.setLayout(layout);
-        for (Card card : cards) {
-            this.add(card);
-        }
+        cards.forEach(this::add);
         // Resizing whole application:
         int width = layout.getColumns() * SIZE;
-        int height = layout.getRows() *  SIZE;
+        int height = layout.getRows() * SIZE;
         this.setSize(new Dimension(width, height)); // Gamepanel mérete elvieg jó
 
         this.setBackground(new Color(87, 159, 170));
@@ -90,31 +88,30 @@ public class GamePanel extends JPanel {
                 this.setIcon(secret);
                 gamePanel.selection = this;
                 this.active = false;
-            } else {
+            } else if (previous != this) {
                 attemptCount++;
-                if (previous != this) {
-                    this.setIcon(secret);
-                    if (this.secret.equals(previous.secret)) {
-                        this.active = false;            // ez a kártya is legyen passzív
-                        gamePanel.selection = null;   // ne legyen többé választott kártya.
-                    } else {
-                        // The colors don't match:
-                        gamePanel.cards.forEach(c -> c.timeout = true);
-                        Timer timer = new Timer(1_000, e -> {
-                            this.setIcon(DEFAULT_ICON);
-                            previous.setIcon(DEFAULT_ICON);
+                this.setIcon(secret);
+                if (this.secret.equals(previous.secret)) {
+                    this.active = false;            // ez a kártya is legyen passzív
+                    gamePanel.selection = null;   // ne legyen többé választott kártya.
+                } else {
+                    // The colors don't match:
+                    gamePanel.cards.forEach(c -> c.timeout = true);
+                    Timer timer = new Timer(1_000, e -> {
+                        this.setIcon(DEFAULT_ICON);
+                        previous.setIcon(DEFAULT_ICON);
 
-                            this.active = true;
-                            previous.active = true;
+                        this.active = true;
+                        previous.active = true;
 
-                            gamePanel.selection = null;
-                            gamePanel.cards.forEach(c -> c.timeout = false);
-                        });
-                        timer.setRepeats(false);
-                        timer.start();
-                    }
+                        gamePanel.selection = null;
+                        gamePanel.cards.forEach(c -> c.timeout = false);
+                    });
+                    timer.setRepeats(false);
+                    timer.start();
                 }
-            }
+            } // else : (previous == this) -> We don't want to do anything anyway.
+
             // Check if we won:
             boolean victory = gamePanel.cards.stream().noneMatch(card -> card.active);
             if (victory) gamePanel.doVictory();
